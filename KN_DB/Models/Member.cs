@@ -27,4 +27,19 @@ public partial class Member
     public virtual ICollection<SectionMember> SectionMembers { get; set; } = new List<SectionMember>();
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
+
+
+    public override string ToString()
+    {
+        string line = @"|";
+        line += Name.PadLeft(22) + "  |";
+        if(DiscordName == null)
+        {
+            DiscordName = "N/A";
+        }
+        line += DiscordName.PadLeft(22) + " |";
+        line += JoinDate.ToString().PadLeft(16) + "  |";
+
+        return line;
+    }
 }

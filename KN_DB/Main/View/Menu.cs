@@ -1,118 +1,35 @@
-﻿using System;
+﻿using KN_DB.Models;
+using System;
 using System.Threading;
-
+ 
 /*
- * 1 naprawić esc 
- * (2) dodać menu poziome
- * (3) dodać metodę przyjmującą input
+ * Klasa odpowiedzialna za komunikację z użytkownikiem (View)
+ * 
  * 
  */
 
-namespace KN_DB.Main
+namespace KN_DB.Main.View
 {
-    internal class Menu
+    internal class Menu : BaseMenu
     {
+        private readonly Presenter _presenter;
 
-        bool running;
-        int choice = 0;
+        public Menu()
+        {
+            _presenter = new Presenter(this);
+        }
 
         private void Startup()
         {
             Console.WindowHeight = 20;
             Console.WindowWidth = 69;
-            
-            
+
             Console.Write(welcome_panel);
             Thread.Sleep(1000);
             while (Console.KeyAvailable) Console.ReadKey(true);
         }
-        public void Run()
-        {
-            Startup();
-            ConsoleKey key = ConsoleKey.S;
-            choice = 0;
-            do
-            {
-                Console.Clear();
-                Console.WriteLine(main_menu[choice]);
-
-                key = Console.ReadKey().Key;
-                if (ChoiceHandle(key, main_menu.Length))
-                {
-                    switch (choice)
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                            MemberMenu();
-                            choice = 0;
-                            break;
-                        case 2:
-                            CoursesMenu();
-                            choice = 0;
-                            break;
-                        case 3:
-                            SectionsMenu();
-                            choice = 0;
-                            break;
-                        case 4:
-                            ProjectsMenu();
-                            choice = 0;
-                            break;
-                        case 5:
-                            return;
-                    }
-                }
-            } while (key != ConsoleKey.Escape);
-
-            Console.Clear();
-            //komunikat na wyjście
-        }
 
 
-        private bool ChoiceHandle(ConsoleKey key, int length)
-        {
-            if (key == ConsoleKey.UpArrow)
-            {
-                choice = Math.Max(1, choice - 1);
-            }
-            if (key == ConsoleKey.DownArrow)
-            {
-                choice = Math.Min(length - 1, choice + 1);
-            }
-            if (key == ConsoleKey.Enter)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private void MemberMenu()
-        {
-            ConsoleKey key = ConsoleKey.S;
-            choice = 0;
-            do
-            {
-                Console.Clear();
-                Console.WriteLine(member_menu[choice]);
-
-                key = Console.ReadKey().Key;
-                if (ChoiceHandle(key, member_menu.Length))
-                {
-                    switch (choice)
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            return;
-                    }
-                }
-            } while (key != ConsoleKey.Escape);
-        }
         private void CoursesMenu()
         {
             ConsoleKey key = ConsoleKey.S;
@@ -174,7 +91,7 @@ namespace KN_DB.Main
                 Console.Clear();
                 Console.WriteLine(projects_menu[choice]);
 
-                key = Console.ReadKey().Key;
+                key = Console.ReadKey(false).Key;
                 if (ChoiceHandle(key, projects_menu.Length))
                 {
                     switch (choice)
@@ -192,6 +109,51 @@ namespace KN_DB.Main
             } while (key != ConsoleKey.Escape);
         }
 
+        internal void showEntity(string? v)
+        {
+            if (string.IsNullOrEmpty(v)) return;
+            Console.WriteLine(v);
+        }
+
+        internal void printHeader()
+        {
+            Console.Clear();
+            Console.WriteLine(member_header);
+        }
+
+        internal void memberBottomMenu()
+        {
+            Console.Write(bottom_menu);
+        }
+
+        protected override void HandleChoice(int choice)
+        {
+            switch (choice)
+            {
+                case 0:
+                    break;
+                case 1:
+                    MemberMenu menu = new MemberMenu();
+                    menu.Run();
+                    choice = 0;
+                    break;
+                case 2:
+                    CoursesMenu();
+                    choice = 0;
+                    break;
+                case 3:
+                    SectionsMenu();
+                    choice = 0;
+                    break;
+                case 4:
+                    ProjectsMenu();
+                    choice = 0;
+                    break;
+                case 5:
+                    Environment.Exit(0);
+                    return;
+            }
+        }
 
         readonly string welcome_panel =
 @"
@@ -215,6 +177,20 @@ namespace KN_DB.Main
     |                                                           |
     <>_________________________________________________________<>
 ";
+
+        string bottom_menu =
+@"|---<>_________________________________________________________<>---|
+    |                                                           |
+    <>_________________________________________________________<>
+";
+
+        readonly string member_header =
+@"   <>-----------------------------------------------------------<>
+   |                  CZŁONKOWIE _ STRONA 0/0                    |
+|--<>-----------------------------------------------------------<>--|
+| Imię                   | Nazwa na discord      | Data dołączenia  |
+|                        |                       |                  |";
+
         readonly string[] main_menu = {
 @"
    <>-----------------------------------------------------------<>
@@ -342,92 +318,7 @@ namespace KN_DB.Main
     |                                                           |
     <>_________________________________________________________<>"
         };
-        readonly string[] member_menu = {
-@"
-   <>-----------------------------------------------------------<>
-   |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
-   <>-----------------------------------------------------------<>
-    |                                                           |
-    |                                                           |
-    |     WYSWIETL CZLONKOW                                     |
-    |                                                           |
-    |      DODAJ NOWEGO CZLONKA                                 |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                            WSTECZ esc     |
-    <>_________________________________________________________<>
-    |                                                           |
-    <>_________________________________________________________<>",
-
-@"
-   <>-----------------------------------------------------------<>
-   |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
-   <>-----------------------------------------------------------<>
-    |                                                           |
-    |                                                           |
-    | >>  WYSWIETL CZLONKOW                                     |
-    |                                                           |
-    |      DODAJ NOWEGO CZLONKA                                 |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                            WSTECZ esc     |
-    <>_________________________________________________________<>
-    |                                                           |
-    <>_________________________________________________________<>",
-
-@"
-   <>-----------------------------------------------------------<>
-   |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
-   <>-----------------------------------------------------------<>
-    |                                                           |
-    |                                                           |
-    |     WYSWIETL CZLONKOW                                     |
-    |                                                           |
-    |   >> DODAJ NOWEGO CZLONKA                                 |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                            WSTECZ esc     |
-    <>_________________________________________________________<>
-    |                                                           |
-    <>_________________________________________________________<>",
-
-@"
-   <>-----------------------------------------------------------<>
-   |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
-   <>-----------------------------------------------------------<>
-    |                                                           |
-    |                                                           |
-    |     WYSWIETL CZLONKOW                                     |
-    |                                                           |
-    |      DODAJ NOWEGO CZLONKA                                 |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                            WSTECZ  <<     |
-    <>_________________________________________________________<>
-    |                                                           |
-    <>_________________________________________________________<>"
-
-        };
+        readonly string[] member_menu =;
         readonly string[] courses_menu = {
 @"
    <>-----------------------------------------------------------<>
@@ -686,5 +577,140 @@ namespace KN_DB.Main
     <>_________________________________________________________<>"
 
         };
+
+        protected override string[] MenuItems
+        {
+            get
+            {
+                return new string[] {
+        @"
+           <>-----------------------------------------------------------<>
+           |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
+           <>-----------------------------------------------------------<>
+            |                                                           |
+            |                                                           |
+            |     CZŁONKOWIE                                            |
+            |                                                           |
+            |      KURSY                                                |
+            |                                                           |
+            |       SEKCJE                                              |
+            |                                                           |
+            |        PROJEKTY                                           |
+            |                                                           |
+            |                                                           |
+            |                                                           |
+            |                                           WYJSCIE esc     |
+            <>_________________________________________________________<>
+            |                                                           |
+            <>_________________________________________________________<>",
+
+        @"
+           <>-----------------------------------------------------------<>
+           |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
+           <>-----------------------------------------------------------<>
+            |                                                           |
+            |                                                           |
+            |  >> CZŁONKOWIE                                            |
+            |                                                           |
+            |      KURSY                                                |
+            |                                                           |
+            |       SEKCJE                                              |
+            |                                                           |
+            |        PROJEKTY                                           |
+            |                                                           |
+            |                                                           |
+            |                                                           |
+            |                                           WYJSCIE esc     |
+            <>_________________________________________________________<>
+            |                                                           |
+            <>_________________________________________________________<>",
+
+        @"
+           <>-----------------------------------------------------------<>
+           |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
+           <>-----------------------------------------------------------<>
+            |                                                           |
+            |                                                           |
+            |     CZŁONKOWIE                                            |
+            |                                                           |
+            |   >> KURSY                                                |
+            |                                                           |
+            |       SEKCJE                                              |
+            |                                                           |
+            |        PROJEKTY                                           |
+            |                                                           |
+            |                                                           |
+            |                                                           |
+            |                                           WYJSCIE esc     |
+            <>_________________________________________________________<>
+            |                                                           |
+            <>_________________________________________________________<>",
+
+        @"
+           <>-----------------------------------------------------------<>
+           |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
+           <>-----------------------------------------------------------<>
+            |                                                           |
+            |                                                           |
+            |     CZŁONKOWIE                                            |
+            |                                                           |
+            |      KURSY                                                |
+            |                                                           |
+            |    >> SEKCJE                                              |
+            |                                                           |
+            |        PROJEKTY                                           |
+            |                                                           |
+            |                                                           |
+            |                                                           |
+            |                                           WYJSCIE esc     |
+            <>_________________________________________________________<>
+            |                                                           |
+            <>_________________________________________________________<>",
+
+        @"
+           <>-----------------------------------------------------------<>
+           |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
+           <>-----------------------------------------------------------<>
+            |                                                           |
+            |                                                           |
+            |     CZŁONKOWIE                                            |
+            |                                                           |
+            |      KURSY                                                |
+            |                                                           |
+            |       SEKCJE                                              |
+            |                                                           |
+            |     >> PROJEKTY                                           |
+            |                                                           |
+            |                                                           |
+            |                                                           |
+            |                                           WYJSCIE esc     |
+            <>_________________________________________________________<>
+            |                                                           |
+            <>_________________________________________________________<>",
+
+        @"
+           <>-----------------------------------------------------------<>
+           |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
+           <>-----------------------------------------------------------<>
+            |                                                           |
+            |                                                           |
+            |     CZŁONKOWIE                                            |
+            |                                                           |
+            |      KURSY                                                |
+            |                                                           |
+            |       SEKCJE                                              |
+            |                                                           |
+            |        PROJEKTY                                           |
+            |                                                           |
+            |                                                           |
+            |                                                           |
+            |                                           WYJSCIE  <<     |
+            <>_________________________________________________________<>
+            |                                                           |
+            <>_________________________________________________________<>"
+                };
+            }
+        }
+        
     }
 }
