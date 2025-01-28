@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +10,15 @@ namespace KN_DB.Main.View
     internal abstract class BaseMenu
     {
         protected int choice = 0;
-        ConsoleKey key;
+        protected int bottom_choice = 0;
+        protected ConsoleKey key;
+        protected Presenter _presenter;
+
+        protected BaseMenu(Presenter presenter) { _presenter = presenter; }
+        
         protected abstract string[] MenuItems { get; }
+        protected abstract string[] MenuParts { get; }
+
         protected abstract void HandleChoice(int choice);
 
         public void Run()
@@ -23,23 +31,34 @@ namespace KN_DB.Main.View
                 ShowMenu();
 
                 key = Console.ReadKey().Key;
-                if (ChoiceHandle(key, MenuItems.Length))
+                if (ChoiceHandle(key))
                 {
                     HandleChoice(choice);
                 }
             } while (key != ConsoleKey.Escape);
         }
 
-        protected bool ChoiceHandle(ConsoleKey key, int length)
+        protected bool ChoiceHandle(ConsoleKey key)
         {
             if (key == ConsoleKey.UpArrow)
             {
                 choice = Math.Max(1, choice - 1);
             }
+            else
             if (key == ConsoleKey.DownArrow)
             {
-                choice = Math.Min(length - 1, choice + 1);
+                choice = Math.Min(MenuItems.Length - 1, choice + 1);
             }
+            else
+            if (key == ConsoleKey.LeftArrow)
+            {
+                bottom_choice = Math.Max(1, bottom_choice - 1);
+            }else
+            if (key == ConsoleKey.RightArrow)
+            {
+                bottom_choice = Math.Min(MenuParts.Length - 1, bottom_choice + 1);
+            }
+            else
             if (key == ConsoleKey.Enter)
             {
                 return true;

@@ -30,7 +30,7 @@ namespace KN_DB.Main
                 {
                     _menu.showEntity(entity.ToString());
                 }
-                _menu.memberBottomMenu();
+                _menu.printBottomMenu();
             }
         }
 

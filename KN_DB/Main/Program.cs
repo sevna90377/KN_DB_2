@@ -12,6 +12,7 @@ namespace KN_DB.Main
         static void Main(string[] args)
         {
             Menu menu = new Menu();
+            menu.Startup();
             menu.Run();
         }
     }

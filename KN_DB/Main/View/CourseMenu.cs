@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace KN_DB.Main.View
 {
-    internal class MemberMenu : BaseMenu
+    internal class CourseMenu : BaseMenu
     {
-        public MemberMenu(Presenter presenter) : base(presenter)
+        public CourseMenu(Presenter presenter) : base(presenter)
         {
         }
 
@@ -19,18 +19,10 @@ namespace KN_DB.Main.View
                 case 0:
                     break;
                 case 1:
-                    Console.Clear();
-                    _presenter.UserTable();
-                    Console.ReadLine();
                     break;
                 case 2:
-                    _presenter.CouncilTable();
-                    Console.ReadLine();
                     break;
                 case 3:
-                    //new member
-                    break;
-                case 4:
                     key = ConsoleKey.Escape;
                     return;
             }
@@ -41,18 +33,19 @@ namespace KN_DB.Main.View
         {
             get
             {
-                return new string[] {
+                return new string[]
+                     {
 @"
     <>-----------------------------------------------------------<>
     |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
     <>-----------------------------------------------------------<>
      |                                                           |
      |                                                           |
-     |     WYSWIETL CZLONKOW                                     |
+     |     WYSWIETL KURSY                                        |
      |                                                           |
-     |      WYSWIETL CZLONKOW ZARZADU                            |
+     |      DODAJ NOWY KURS                                      |
      |                                                           |
-     |       DODAJ NOWEGO CZLONKA                                |
+     |                                                           |
      |                                                           |
      |                                                           |
      |                                                           |
@@ -69,32 +62,11 @@ namespace KN_DB.Main.View
     <>-----------------------------------------------------------<>
      |                                                           |
      |                                                           |
-     |  >> WYSWIETL CZLONKOW                                     |
+     | >>  WYSWIETL KURSY                                        |
      |                                                           |
-     |      WYSWIETL CZLONKOW ZARZADU                            |
-     |                                                           |
-     |       DODAJ NOWEGO CZLONKA                                |
+     |      DODAJ NOWY KURS                                      |
      |                                                           |
      |                                                           |
-     |                                                           |
-     |                                                           |
-     |                                                           |
-     |                                            WSTECZ esc     |
-     <>_________________________________________________________<>
-     |                                                           |
-     <>_________________________________________________________<>",
-
-@"
-    <>-----------------------------------------------------------<>
-    |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
-    <>-----------------------------------------------------------<>
-     |                                                           |
-     |                                                           |
-     |     WYSWIETL CZLONKOW                                     |
-     |                                                           |
-     |   >> WYSWIETL CZLONKOW ZARZADU                            |
-     |                                                           |
-     |       DODAJ NOWEGO CZLONKA                                |
      |                                                           |
      |                                                           |
      |                                                           |
@@ -111,11 +83,11 @@ namespace KN_DB.Main.View
     <>-----------------------------------------------------------<>
      |                                                           |
      |                                                           |
-     |     WYSWIETL CZLONKOW                                     |
+     |     WYSWIETL KURSY                                        |
      |                                                           |
-     |      WYSWIETL CZLONKOW ZARZADU                            |
+     |   >> DODAJ NOWY KURS                                      |
      |                                                           |
-     |    >> DODAJ NOWEGO CZLONKA                                |
+     |                                                           |
      |                                                           |
      |                                                           |
      |                                                           |
@@ -132,11 +104,11 @@ namespace KN_DB.Main.View
     <>-----------------------------------------------------------<>
      |                                                           |
      |                                                           |
-     |     WYSWIETL CZLONKOW                                     |
+     |     WYSWIETL KURSY                                        |
      |                                                           |
-     |      WYSWIETL CZLONKOW ZARZADU                            |
+     |      DODAJ NOWY KURS                                      |
      |                                                           |
-     |       DODAJ NOWEGO CZLONKA                                |
+     |                                                           |
      |                                                           |
      |                                                           |
      |                                                           |
@@ -146,6 +118,7 @@ namespace KN_DB.Main.View
      <>_________________________________________________________<>
      |                                                           |
      <>_________________________________________________________<>"
+
                 };
             }
         }
