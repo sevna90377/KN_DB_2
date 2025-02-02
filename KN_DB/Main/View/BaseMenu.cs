@@ -11,8 +11,8 @@ namespace KN_DB.Main.View
 {
     internal abstract class BaseMenu
     {
-        protected int choice = 0;
-        protected int bottom_choice = 0;
+        protected int choice = 0;           // wybrana pozycja w menu
+        protected int bottom_choice = 0;    // wybrana pozycja w menu "dolnego" dla wyświetlanej akurat tabeli
         protected ConsoleKey key;
         protected Presenter _presenter;
         protected int[] window_size_thin = { 20, 69 };
@@ -20,14 +20,14 @@ namespace KN_DB.Main.View
 
         protected BaseMenu(Presenter presenter) { _presenter = presenter; }
 
-        protected abstract string[] MenuItems { get; }
-        protected abstract string[] MenuParts { get; }
-        protected abstract string MenuHeader { get; }
+        protected abstract string[] MenuItems { get; }      // pre-wygenerowane ekrany z kolejnymi pozycjami menu
+        protected abstract string[] MenuParts { get; }      // pozycje jakie powinny się znaleźć w dolnym menu
+        protected abstract string MenuHeader { get; }       // ozdobny nagłówek menu
 
-        protected abstract void HandleChoice(int choice);
-        protected abstract void HandleBottomChoice(int choice, int bottom_choice);
+        protected abstract void HandleChoice(int choice);                           // obsługa wyboru z menu
+        protected abstract void HandleBottomChoice(int choice, int bottom_choice);  // obsługa wyboru z menu dolnego
 
-        public void Run()
+        public void Run()           // główna pętla menu
         {
             key = ConsoleKey.S;
             choice = 0;
@@ -36,7 +36,7 @@ namespace KN_DB.Main.View
                 Console.Clear();
                 ShowMenu();
 
-                key = Console.ReadKey().Key;
+                key = Console.ReadKey(intercept: true).Key;
                 if (ChoiceHandle(key))
                 {
                     HandleChoice(choice);
@@ -44,17 +44,16 @@ namespace KN_DB.Main.View
             } while (key != ConsoleKey.Escape);
         }
 
-        public void RunTable()
+        public void RunTable()      // pętla dolnego menu dla wyświetlanej tabeli
         {
-            printBottomMenu();
+            printBottomMenu();  // rysuje dolną część ramki
             key = ConsoleKey.S;
-            choice = 5;
             bottom_choice = 0;
             Console.SetCursorPosition(0, Console.CursorTop - 2);
             do
             {
-                ShowBottomMenu();
-                key = Console.ReadKey().Key;
+                ShowBottomMenu();   // wypełnia dolne menu opcjami
+                key = Console.ReadKey(intercept: true).Key;
                 if (ChoiceHandle(key))
                 {
                     HandleBottomChoice(choice, bottom_choice);
@@ -76,7 +75,7 @@ namespace KN_DB.Main.View
         }
 
         protected int y = 5, prev_y = 5;
-        private void Highlight()
+        private void Highlight()    // wizualne oznaczenie, która encja jest akurat wybrana do wykonania czynności z menu
         {
             int originalTop = Console.CursorTop;
             int originalLeft = Console.CursorLeft;
@@ -86,7 +85,7 @@ namespace KN_DB.Main.View
             Console.SetCursorPosition(1, y);
             Console.WriteLine(">>");
 
-            prev_y = y;
+            prev_y = y; // zapamiętanie miejsca do zmazania następnym razem 
 
             Console.SetCursorPosition(originalLeft, originalTop);
         }
@@ -119,7 +118,7 @@ namespace KN_DB.Main.View
             }
             return false;
         }
-        private void ShowMenu()
+        private void ShowMenu() // wyświetlenie ekranu z odpowiednim wyborem
         {
             Console.WriteLine(MenuItems[choice]);
         }
@@ -137,8 +136,10 @@ namespace KN_DB.Main.View
                 Console.WriteLine(item);
             }
         }
+
         private void ShowBottomMenu()
         {
+            // formatowanie pozycji dolnego menu - oklejenie spacjami w równych odstępach, i zaznaczenie obecnie wybranej pozycji
             string left = string.Join("   ", MenuParts.Where((part, index) => index == bottom_choice - 1)).PadLeft(8).PadRight(11);
             string chosen = ("< " + MenuParts[bottom_choice].PadRight(8).PadLeft(10) + " >   ");
             string right = string.Join("   ", MenuParts.Where((part, index) => index > bottom_choice));
@@ -146,7 +147,7 @@ namespace KN_DB.Main.View
             string line = left + chosen + right;
             line = line.Length > 56 ? line.Substring(0, 56) : line.PadRight(56);
 
-            Console.SetCursorPosition(7, Console.CursorTop);
+            Console.SetCursorPosition(7, Console.CursorTop);    // powrót kursora na początek linii
             Console.Write(line);
         }
 
@@ -187,6 +188,13 @@ namespace KN_DB.Main.View
                 Console.WindowHeight = window_size_thin[0];
                 Console.WindowWidth = window_size_thin[1];
             }
+        }
+
+        internal void ErrorMessage(string v)
+        {
+            Console.SetCursorPosition(7, Console.CursorTop);    // powrót kursora na początek linii
+            Console.WriteLine(v);
+            Thread.Sleep(2000);
         }
     }
 }

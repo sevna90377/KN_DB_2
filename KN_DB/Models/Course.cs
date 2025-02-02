@@ -1,20 +1,26 @@
-﻿using System;
+﻿using KN_DB.Attributes;
+using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace KN_DB.Models;
 
 public partial class Course
 {
+    [IgnoreOnCreation]
     public int CourseId { get; set; }
 
     public string? Name { get; set; }
 
     public string? Description { get; set; }
 
+    [IgnoreOnCreation]
     public int? LecturerId { get; set; }
 
+    [IgnoreOnCreation]
     public virtual ICollection<CourseMember> CourseMembers { get; set; } = new List<CourseMember>();
 
+    [IgnoreOnCreation]
     public virtual Member? Lecturer { get; set; }
 
     public override string ToString()

@@ -29,7 +29,7 @@ namespace KN_DB.Main.View
                     HandleBottomChoice(choice, bottom_choice);
                     break;
                 case 2:
-                    _presenter.AddEntity<Member>();
+                    _presenter.Add<Member>();
                     break;
                 case 3:
                     key = ConsoleKey.Escape;
@@ -51,7 +51,7 @@ namespace KN_DB.Main.View
                     bottom_choice = 0;
                     break;
                 case 2:
-                    _presenter.AddEntity<Course>();
+                    _presenter.Add<Course>();
                     bottom_choice = 0;
                     break;
                 case 3:

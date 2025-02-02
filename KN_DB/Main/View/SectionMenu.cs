@@ -24,7 +24,7 @@ namespace KN_DB.Main.View
                     _presenter.Show(table => table.Sections);
                     break;
                 case 2:
-                    _presenter.AddEntity<Member>();
+                    _presenter.Add<Member>();
                     break;
                 case 3:
                     key = ConsoleKey.Escape;
@@ -45,7 +45,7 @@ namespace KN_DB.Main.View
                     bottom_choice = 0;
                     break;
                 case 2:
-                    _presenter.AddEntity<Section>();
+                    _presenter.Add<Section>();
                     bottom_choice = 0;
                     break;
                 case 3:

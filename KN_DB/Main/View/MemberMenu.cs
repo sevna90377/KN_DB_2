@@ -24,6 +24,7 @@ namespace KN_DB.Main.View
                     Console.Clear();
                     _presenter.Show(table => table.Members.OrderBy(m => m.MemberId));
                     sizeSwitch();
+                    choice = 0;
                     break;
                 case 2:
                     Console.Clear();
@@ -34,10 +35,11 @@ namespace KN_DB.Main.View
                     sizeSwitch();
                     break;
                 case 3:
-                    _presenter.AddEntity<Member>();
+                    _presenter.Add<Member>();
                     break;
                 case 4:
                     key = ConsoleKey.Escape;
+                    choice = 0;
                     return;
             }
             key = ConsoleKey.S;
@@ -57,7 +59,7 @@ namespace KN_DB.Main.View
                     bottom_choice = 0;
                     break;
                 case 3:
-                    _presenter.AddEntity<Member>();
+                    _presenter.Add<Member>();
                     Console.Clear();
                     _presenter.Show(table => table.Members.OrderBy(m => m.MemberId));
                     bottom_choice = 0;
@@ -65,7 +67,7 @@ namespace KN_DB.Main.View
                 case 4:
                     key = ConsoleKey.Escape;
                     break;
-            };
+            }
         }
 
         protected override string[] MenuItems

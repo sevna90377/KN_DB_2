@@ -81,7 +81,7 @@ namespace KN_DB.Main.View
     |  znajdziesz tu informacje o wszystkich członkach, ich     |
     |  projektach, sekcjach i kursach, do których należą;       |
     |                                                           |
-    |     UŻYJ MYSZY, aby wybrać rząd do edycji/usunięcia!      |
+    |                                                           |
     |                                                           |
     |                                                           |
     |                                                           |
@@ -89,7 +89,7 @@ namespace KN_DB.Main.View
     |                                                           |
     |                                                           |
     <>_________________________________________________________<>
-    |        wcisnij dowolny przycisk aby kontynuowac :)        |
+    |        wcisnij dowolny klawisz aby kontynuowac :)         |
     <>_________________________________________________________<>
 ";
 

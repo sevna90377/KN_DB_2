@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KN_DB.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace KN_DB.Models;
@@ -8,18 +9,19 @@ namespace KN_DB.Models;
 /// </summary>
 public partial class Section
 {
+    [IgnoreOnCreation]
     public int SectionId { get; set; }
 
     public string Name { get; set; } = null!;
 
     public string? Description { get; set; }
-
+    [IgnoreOnCreation]
     public int? LeadId { get; set; }
-
+    [IgnoreOnCreation]
     public virtual Member? Lead { get; set; }
-
+    [IgnoreOnCreation]
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
-
+    [IgnoreOnCreation]
     public virtual ICollection<SectionMember> SectionMembers { get; set; } = new List<SectionMember>();
 
     public override string ToString()

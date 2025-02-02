@@ -26,7 +26,7 @@ namespace KN_DB.Main.View
                     Console.ReadLine();
                     break;
                 case 2:
-                    _presenter.AddEntity<Member>();
+                    _presenter.Add<Member>();
                     break;
                 case 3:
                     key = ConsoleKey.Escape;
@@ -47,7 +47,7 @@ namespace KN_DB.Main.View
                     bottom_choice = 0;
                     break;
                 case 2:
-                    _presenter.AddEntity<Project>();
+                    _presenter.Add<Project>();
                     bottom_choice = 0;
                     break;
                 case 3:
