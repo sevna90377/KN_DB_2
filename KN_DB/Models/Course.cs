@@ -16,4 +16,20 @@ public partial class Course
     public virtual ICollection<CourseMember> CourseMembers { get; set; } = new List<CourseMember>();
 
     public virtual Member? Lecturer { get; set; }
+
+    public override string ToString()
+    {
+        string line = @"|";
+        line += Name.PadLeft(35) + " |";
+        if (Lecturer == null || Lecturer.Name == null)
+        {
+            line += "N/A".PadLeft(22) + " |";
+        }else
+        {
+            line += Lecturer.Name.PadLeft(22) + " |";
+        }
+        line += CourseMembers.Count().ToString().PadLeft(5) + " |";
+
+        return line;
+    }
 }

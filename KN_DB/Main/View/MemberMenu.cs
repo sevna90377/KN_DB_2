@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KN_DB.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,23 +20,53 @@ namespace KN_DB.Main.View
                 case 0:
                     break;
                 case 1:
+                    sizeSwitch();
                     Console.Clear();
-                    _presenter.UserTable();
-                    Console.ReadLine();
+                    _presenter.Show(table => table.Members.OrderBy(m => m.MemberId));
+                    sizeSwitch();
                     break;
                 case 2:
-                    _presenter.CouncilTable();
-                    Console.ReadLine();
+                    Console.Clear();
+                    sizeSwitch();
+                    Func<PostgresContext, IQueryable<Member>> query = context => context.Members
+        .Where(m => m.IsCouncilMember);
+                    _presenter.Show(query);
+                    sizeSwitch();
                     break;
                 case 3:
-                    //new member
+                    _presenter.AddEntity<Member>();
                     break;
                 case 4:
                     key = ConsoleKey.Escape;
                     return;
             }
+            key = ConsoleKey.S;
         }
 
+        protected override void HandleBottomChoice(int choice, int bottom_choice)
+        {
+            switch (bottom_choice)
+            {
+                case 0:
+                    _presenter.Show(table => table.Members.OrderBy(m => m.MemberId), y-5);
+                    bottom_choice = 0;
+                    break;
+                case 1: //
+                    break;
+                case 2:
+                    bottom_choice = 0;
+                    break;
+                case 3:
+                    _presenter.AddEntity<Member>();
+                    Console.Clear();
+                    _presenter.Show(table => table.Members.OrderBy(m => m.MemberId));
+                    bottom_choice = 0;
+                    break;
+                case 4:
+                    key = ConsoleKey.Escape;
+                    break;
+            };
+        }
 
         protected override string[] MenuItems
         {
@@ -150,6 +181,34 @@ namespace KN_DB.Main.View
             }
         }
 
-        protected override string[] MenuParts => throw new NotImplementedException();
+        protected override string[] MenuParts
+        {
+            get
+            {
+                return new string[] {
+
+                    "INFORMACJE",
+                    "EDYTUJ",
+                    "USUN",
+                    "DODAJ",
+                    "WSTECZ"
+                };
+            }
+        }
+
+        protected override string MenuHeader
+        {
+            get
+            {
+                return
+
+@"   <>-----------------------------------------------------------<>
+   |                        CZŁONKOWIE                           |
+|--<>-----------------------------------------------------------<>--|
+| Imię                   | Nazwa na discord      | Data dołączenia  |
+|                        |                       |                  |";
+
+            }
+        }
     }
 }

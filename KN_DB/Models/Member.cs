@@ -16,7 +16,7 @@ public partial class Member
 
     public DateOnly? JoinDate { get; set; }
 
-    public bool? IsCouncilMember { get; set; }
+    public bool IsCouncilMember { get; set; }
 
     public virtual ICollection<CourseMember> CourseMembers { get; set; } = new List<CourseMember>();
 
@@ -31,13 +31,13 @@ public partial class Member
 
     public override string ToString()
     {
-        string line = @"|";
-        line += Name.PadLeft(22) + "  |";
+        string line = "|".PadLeft(13);
+        line += Name.PadLeft(32) + "  |";
         if(DiscordName == null)
         {
             DiscordName = "N/A";
         }
-        line += DiscordName.PadLeft(22) + " |";
+        line += DiscordName.PadLeft(27) + "  |";
         line += JoinDate.ToString().PadLeft(16) + "  |";
 
         return line;

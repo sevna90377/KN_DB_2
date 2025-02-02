@@ -1,5 +1,6 @@
 ﻿using KN_DB.Models;
 using System;
+using System.Security;
 using System.Threading;
  
 /*
@@ -12,6 +13,7 @@ namespace KN_DB.Main.View
 {
     internal class Menu : BaseMenu
     {
+        BaseMenu currentContext;
 
         public Menu() : base(null)
         {
@@ -20,37 +22,12 @@ namespace KN_DB.Main.View
 
         public void Startup()
         {
-            Console.WindowHeight = 20;
-            Console.WindowWidth = 69;
+            Console.WindowHeight = window_size_thin[0];
+            Console.WindowWidth = window_size_thin[1];
 
             Console.Write(welcome_panel);
-            Thread.Sleep(1000);
+            Console.ReadKey();
             while (Console.KeyAvailable) Console.ReadKey(true);
-        }
-
-        internal void showEntity(string? v)
-        {
-            if (string.IsNullOrEmpty(v)) return;
-            Console.WriteLine(v);
-        }
-
-        internal void showEntities(string[] v)
-        {
-            if (v == null) return;
-            foreach (var item in v)
-            {
-                Console.WriteLine(item);
-            }
-        }
-
-        internal void printHeader()
-        {
-            Console.WriteLine(MenuParts[0]);
-        }
-
-        internal void printBottomMenu()
-        {
-            Console.WriteLine(MenuParts[MenuParts.Length-1]);
         }
 
         protected override void HandleChoice(int choice)
@@ -60,23 +37,26 @@ namespace KN_DB.Main.View
                 case 0:
                     break;
                 case 1:
-                    MemberMenu mMenu = new(_presenter);
-                    mMenu.Run();
+                    currentContext = new MemberMenu(_presenter);
+                    _presenter.SetCurrentMenu(currentContext);
+                    currentContext.Run();
                     choice = 0;
                     break;
                 case 2:
-                    CourseMenu cMenu = new(_presenter);
-                    cMenu.Run();
+                    currentContext = new CourseMenu(_presenter);
+                    _presenter.SetCurrentMenu(currentContext);
+                    currentContext.Run();
                     choice = 0;
                     break;
                 case 3:
-                    SectionMenu sMenu = new(_presenter);
-                    sMenu.Run();
+                    currentContext = new SectionMenu(_presenter);
+                    _presenter.SetCurrentMenu(currentContext);
+                    currentContext.Run();
                     choice = 0;
                     break;
                 case 4:
-                    ProjectMenu pMenu = new(_presenter);
-                    pMenu.Run();
+                    currentContext = new ProjectMenu(_presenter);
+                    currentContext.Run();
                     choice = 0;
                     break;
                 case 5:
@@ -85,18 +65,23 @@ namespace KN_DB.Main.View
             }
         }
 
+        protected override void HandleBottomChoice(int choice, int bottom_choice)
+        {
+            throw new NotImplementedException();
+        }
+
         readonly string welcome_panel =
 @"
    <>-----------------------------------------------------------<>
    |                SYSTEM OBSŁUGI KÓŁ NAUKOWYCH                 |
    <>-----------------------------------------------------------<>
     |                                                           |
+    |  witaj w bazie!                                           |
     |                                                           |
+    |  znajdziesz tu informacje o wszystkich członkach, ich     |
+    |  projektach, sekcjach i kursach, do których należą;       |
     |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
-    |                                                           |
+    |     UŻYJ MYSZY, aby wybrać rząd do edycji/usunięcia!      |
     |                                                           |
     |                                                           |
     |                                                           |
@@ -104,7 +89,7 @@ namespace KN_DB.Main.View
     |                                                           |
     |                                                           |
     <>_________________________________________________________<>
-    |                                                           |
+    |        wcisnij dowolny przycisk aby kontynuowac :)        |
     <>_________________________________________________________<>
 ";
 
@@ -242,24 +227,8 @@ namespace KN_DB.Main.View
             }
         }
 
-        protected override string[] MenuParts
-        {
-            get
-            {
-                return new string[] {
-@"   <>-----------------------------------------------------------<>
-  |                        CZŁONKOWIE                           |
-|--<>-----------------------------------------------------------<>--|
-| Imię                   | Nazwa na discord      | Data dołączenia  |
-|                        |                       |                  |",
+        protected override string[] MenuParts => new string[0];
 
-@"",
-
-@"|---<>_________________________________________________________<>---|
-    |                                                           |
-    <>_________________________________________________________<>"
-            };
-            }
-        }
+        protected override string MenuHeader => "";
     }
 }

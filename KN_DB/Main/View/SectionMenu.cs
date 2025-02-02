@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KN_DB.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,13 +20,38 @@ namespace KN_DB.Main.View
                 case 0:
                     break;
                 case 1:
+                    Console.Clear();
+                    _presenter.Show(table => table.Sections);
                     break;
                 case 2:
+                    _presenter.AddEntity<Member>();
                     break;
                 case 3:
                     key = ConsoleKey.Escape;
                     return;
             }
+        }
+
+        protected override void HandleBottomChoice(int choice, int bottom_choice)
+        {
+            switch (bottom_choice)
+            {
+                case 0:
+
+                    bottom_choice = 0;
+                    break;
+                case 1:
+
+                    bottom_choice = 0;
+                    break;
+                case 2:
+                    _presenter.AddEntity<Section>();
+                    bottom_choice = 0;
+                    break;
+                case 3:
+                    key = ConsoleKey.Escape;
+                    break;
+            };
         }
 
         protected override string[] MenuItems
@@ -121,6 +147,34 @@ namespace KN_DB.Main.View
             }
         }
 
-        protected override string[] MenuParts => throw new NotImplementedException();
+        protected override string[] MenuParts
+        {
+            get
+            {
+                return new string[] {
+
+                    "EDYTUJ",
+                    "USUN",
+                    "DODAJ",
+                    "WSTECZ"
+                };
+            }
+        }
+
+
+        protected override string MenuHeader
+        {
+            get
+            {
+                return
+
+@"   <>-----------------------------------------------------------<>
+   |                          SEKCJE                             |
+|--<>-----------------------------------------------------------<>--|
+|  Nazwa sekcji          |  Prowadzący sekcji     | l. czł   |
+|                        |                        |          |";
+
+            }
+        }
     }
 }

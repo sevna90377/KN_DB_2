@@ -13,48 +13,240 @@ namespace KN_DB.Main
     internal class Presenter
     {
         
-        private readonly Menu _menu;
+        private BaseMenu _menu;
 
-        public Presenter(Menu menu)
+        public Presenter(BaseMenu menu)
         {
             _menu = menu;
         }
 
-        public void UserTable()
+        public void SetCurrentMenu(BaseMenu menu)
         {
-            _menu.printHeader();
+            _menu = menu;
+        } 
+
+        public void Show<T>(Func<PostgresContext, IQueryable<T>> query) where T : class
+        {
+            _menu.PrintHeader();
             using (var context = new PostgresContext())
             {
-                var entities = context.Members.ToList();
+                var entities = query(context).ToList();
+
                 foreach (var entity in entities)
                 {
-                    _menu.showEntity(entity.ToString());
+                    _menu.ShowEntity(entity.ToString());
                 }
-                _menu.printBottomMenu();
+                _menu.RunTable();
             }
         }
 
-        internal void CouncilTable()
+        public void Show<T>(Func<PostgresContext, IQueryable<T>> query, int i) where T : class
         {
-            throw new NotImplementedException();
+            using (var context = new PostgresContext())
+            {
+                var entities = query(context).ToList();
+                var entity = entities[i];
+                _menu.ShowEntity(entity.ToString());
+            }
         }
 
-        private void addSampleMember()
+        public void AddEntity<TEntity>() where TEntity : class, new()
         {
-            using var context = new PostgresContext();
-            var newMember = new Models.Member { Name = "Monika" };
-            context.Members.Add(newMember);
-            context.SaveChanges();
+            var entity = new TEntity();
+            using (var context = new PostgresContext())
+            {
+                Type entityType = typeof(TEntity);
+
+                foreach (var property in entityType.GetProperties())
+                {
+                    string input = _menu.ShowInputDialog(property.Name);
+
+                    if (string.IsNullOrWhiteSpace(input) && Nullable.GetUnderlyingType(property.PropertyType) != null)
+                    {
+                        property.SetValue(entity, null);
+                    }
+                    else if (property.PropertyType == typeof(string))
+                    {
+                        property.SetValue(entity, input);
+                    }
+                    else if (property.PropertyType == typeof(int) || property.PropertyType == typeof(int?))
+                    {
+                        if (int.TryParse(input, out int intValue) || string.IsNullOrEmpty(input))
+                        {
+                            property.SetValue(entity, string.IsNullOrEmpty(input) ? (int?)null : intValue);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input for an integer. Please try again.");
+                            return;
+                        }
+                    }
+                    else if (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
+                    {
+                        if (bool.TryParse(input, out bool boolValue) || string.IsNullOrEmpty(input))
+                        {
+                            property.SetValue(entity, string.IsNullOrEmpty(input) ? (bool?)null : boolValue);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input for a boolean. Please try again.");
+                            return;
+                        }
+                    }
+                    else if (property.PropertyType == typeof(DateTime) || property.PropertyType == typeof(DateTime?))
+                    {
+                        if (DateTime.TryParse(input, out DateTime dateTimeValue) || string.IsNullOrEmpty(input))
+                        {
+                            property.SetValue(entity, string.IsNullOrEmpty(input) ? (DateTime?)null : dateTimeValue);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input for a DateTime. Please try again.");
+                            return;
+                        }
+                    }
+                    // Add more cases for other data types (e.g., DateTime, etc.)
+                }
+
+                context.Set<TEntity>().Add(entity);
+                context.SaveChanges();
+            }
         }
 
-        string Choice()
+        public void Edit<T>(Func<PostgresContext, IQueryable<T>> query, int i) where T : class, new()
         {
-            return "";
+            using (var context = new PostgresContext())
+            {
+                var entities = query(context).ToList();
+
+                var entity = entities[i];
+
+                // Find the property that ends with "ID" (case-insensitive)
+                var idProperty = entity.GetType()
+                    .GetProperties()
+                    .FirstOrDefault(prop => prop.Name.EndsWith("ID", StringComparison.OrdinalIgnoreCase));
+
+                if (idProperty != null)
+                {
+                    // Get the value of the ID property
+                    var idValue = idProperty.GetValue(entity);
+
+                    // Ensure the ID value is valid and call EditEntity
+                    if (idValue is int id)
+                    {
+                        EditEntity<T>(id);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid ID value for entity: {idValue}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No ID property found on the entity.");
+                }
+            }
         }
 
-        string Line()
+        private void EditEntity<TEntity>(int id) where TEntity : class, new()
         {
-            return "";
+            using (var context = new PostgresContext())
+            {
+                var entity = context.Set<TEntity>().Find(id);
+
+                if (entity == null)
+                {
+                    Console.WriteLine("Entity not found.");
+                    return;
+                }
+
+                Type entityType = typeof(TEntity);
+
+                foreach (var property in entityType.GetProperties())
+                {
+                    string input = _menu.ShowInputDialog(property.Name);
+
+                    if (string.IsNullOrWhiteSpace(input) && Nullable.GetUnderlyingType(property.PropertyType) != null)
+                    {
+                        property.SetValue(entity, null);
+                    }
+                    else if (property.PropertyType == typeof(string))
+                    {
+                        property.SetValue(entity, input);
+                    }
+                    else if (property.PropertyType == typeof(int) || property.PropertyType == typeof(int?))
+                    {
+                        if (int.TryParse(input, out int intValue) || string.IsNullOrEmpty(input))
+                        {
+                            property.SetValue(entity, string.IsNullOrEmpty(input) ? (int?)null : intValue);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input for an integer. Please try again.");
+                            return;
+                        }
+                    }
+                    else if (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
+                    {
+                        if (bool.TryParse(input, out bool boolValue) || string.IsNullOrEmpty(input))
+                        {
+                            property.SetValue(entity, string.IsNullOrEmpty(input) ? (bool?)null : boolValue);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input for a boolean. Please try again.");
+                            return;
+                        }
+                    }
+                    else if (property.PropertyType == typeof(DateTime) || property.PropertyType == typeof(DateTime?))
+                    {
+                        if (DateTime.TryParse(input, out DateTime dateTimeValue) || string.IsNullOrEmpty(input))
+                        {
+                            property.SetValue(entity, string.IsNullOrEmpty(input) ? (DateTime?)null : dateTimeValue);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input for a DateTime. Please try again.");
+                            return;
+                        }
+                    }
+                    // Add more cases for other data types (e.g., DateTime, etc.)
+                }
+
+                context.Set<TEntity>().Add(entity);
+                context.SaveChanges();
+            }
+        }
+
+        public void DeleteEntity<TEntity>(int id) where TEntity : class
+        {
+            using (var context = new PostgresContext())
+            {
+                // Find the ID property
+                var idProperty = typeof(TEntity).GetProperties()
+                    .FirstOrDefault(prop => prop.Name.EndsWith("ID", StringComparison.OrdinalIgnoreCase));
+
+                if (idProperty == null)
+                {
+                    Console.WriteLine("No ID property found for the specified entity type.");
+                    return;
+                }
+
+                // Retrieve all entities and find the one to delete
+                var entity = context.Set<TEntity>().ToList()
+                    .FirstOrDefault(e => idProperty.GetValue(e) != null && (int)idProperty.GetValue(e) == id);
+
+                if (entity == null)
+                {
+                    Console.WriteLine("Entity not found.");
+                    return;
+                }
+
+                // Remove the entity
+                context.Set<TEntity>().Remove(entity);
+                context.SaveChanges();
+                Console.WriteLine("Entity deleted successfully.");
+            }
         }
     }
 }
