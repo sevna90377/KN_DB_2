@@ -73,12 +73,12 @@ public partial class PostgresContext : DbContext
 
             entity.HasOne(d => d.Course).WithMany(p => p.CourseMembers)
                 .HasForeignKey(d => d.CourseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("course_member_courseID_fkey");
 
             entity.HasOne(d => d.Member).WithMany(p => p.CourseMembers)
                 .HasForeignKey(d => d.MemberId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("course_member_memberID_fkey");
         });
 
@@ -128,7 +128,7 @@ public partial class PostgresContext : DbContext
 
             entity.HasOne(d => d.Section).WithMany(p => p.Projects)
                 .HasForeignKey(d => d.SectionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("project_sectionID_fkey");
         });
 
@@ -152,7 +152,7 @@ public partial class PostgresContext : DbContext
 
             entity.HasOne(d => d.Project).WithMany(p => p.ProjectMembers)
                 .HasForeignKey(d => d.ProjectId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("project_member_projectID_fkey");
 
             entity.HasOne(d => d.Role).WithMany(p => p.ProjectMembers)
@@ -214,12 +214,12 @@ public partial class PostgresContext : DbContext
 
             entity.HasOne(d => d.Member).WithMany(p => p.SectionMembers)
                 .HasForeignKey(d => d.MemberId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("section_member_memberID_fkey");
 
             entity.HasOne(d => d.Section).WithMany(p => p.SectionMembers)
                 .HasForeignKey(d => d.SectionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("section_member_sectionID_fkey");
         });
 

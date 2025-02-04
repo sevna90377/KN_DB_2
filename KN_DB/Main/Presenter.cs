@@ -8,8 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// klasa przygotowuje ekrany z kolumnami danych dla Menu
-
 namespace KN_DB.Main
 {
     internal class Presenter
@@ -40,7 +38,7 @@ namespace KN_DB.Main
                 }
                 _menu.RunTable();
             }
-        }
+        }   // cała tabela
 
         public void Show<T>(Func<PostgresContext, IQueryable<T>> query, int i) where T : class
         {
@@ -50,19 +48,76 @@ namespace KN_DB.Main
                 var entity = entities[i];
                 _menu.ShowEntity(entity.ToString());
             }
-        }
+        }   // i-ta encja
 
-        public void Add<TEntity>() where TEntity : class, new()
+        public int IdfromIndex<T>(Func<PostgresContext, IQueryable<T>> query, int i)
         {
-            var entity = new TEntity();     
+            /* aby uzyskać wartość pola ID dla odpowiedniej encji 
+             * konieczne jest odtworzenie kolejności wypisywania
+             * poprzez wykorzystanie tej samej kwerendy
+             */
 
             using (var context = new PostgresContext())
             {
+                var entities = query(context).ToList();
+                if (i >= 0 && i < entities.Count)
+                {
+                    var entity = entities[i];
+                    // wybór pola z Id enjci
+                    var idProperty = entity.GetType()
+                        .GetProperties()
+                        .FirstOrDefault(prop => prop.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase));
+                    if (idProperty != null)
+                    {
+                        var idValue = idProperty.GetValue(entity);
+                        if (idValue is int id)
+                        {
+                            return id;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Invalid ID value for entity: {idValue}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No ID property found on the entity.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid index.");
+                }
+
+                return 0;
+            }
+        }
+
+        public void Add<TEntity>(int? entityId = null) where TEntity : class, new()
+        {
+            using (var context = new PostgresContext())
+            {
+                TEntity entity;
                 Type entityType = typeof(TEntity);
+
+                if(entityId.HasValue)
+                {
+                    entity = context.Set<TEntity>().Find(entityId.Value);
+                    if (entity == null)
+                    {
+                        _menu.ErrorMessage("Nie znaleziono encji.");
+                        return;
+                    }
+                }
+                else
+                {
+                    entity = new TEntity();
+                }
+
 
                 foreach (var property in entityType.GetProperties())
                 {
-                    // pole jest oznaczone atrybutem, aby zostało zignorowane przy wprowadzaniu wartości przez użytkownika
+                    // pole klas oznaczone atrybutem zostanie pominięte przy wprowadzaniu wartości przez użytkownika
                     if(Attribute.IsDefined(property, typeof(IgnoreOnCreation)))
                     {
                         continue;
@@ -75,7 +130,7 @@ namespace KN_DB.Main
                     {
                         if (Nullable.GetUnderlyingType(property.PropertyType) != null)
                             property.SetValue(entity, null);
-                        else
+                        else if (!entityId.HasValue)
                         {
                             _menu.ErrorMessage("Pole nie może być puste!");
                             return;
@@ -112,12 +167,11 @@ namespace KN_DB.Main
                     }
                     else if (property.PropertyType == typeof(DateOnly) || property.PropertyType == typeof(DateOnly?))
                     {
-                        if (DateOnly.TryParseExact(input, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly parsedDate))
+                        if (!string.IsNullOrWhiteSpace(input) && DateOnly.TryParseExact(input, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly parsedDate))
                         {
-                            Console.WriteLine(parsedDate);
                             property.SetValue(entity, parsedDate);
                         }
-                        else
+                        else if (!string.IsNullOrWhiteSpace(input))
                         {
                             _menu.ErrorMessage("Podano niepoprawną wartość dla - data d.mm.rrrr -");
                             return;
@@ -125,43 +179,51 @@ namespace KN_DB.Main
                     }
                 }
 
-                context.Set<TEntity>().Add(entity);
+                if (!entityId.HasValue)
+                {
+                    context.Set<TEntity>().Add(entity);
+                }
+                else
+                {
+                    context.Set<TEntity>().Update(entity);
+                }
                 context.SaveChanges();
             }
         }
 
-        internal void Edit<T>(Func<PostgresContext, IQueryable<T>> query, int i) where T : class, new()
+        public void Delete<TEntity>(int id) where TEntity : class
         {
             using (var context = new PostgresContext())
             {
-                var entities = query(context).ToList();
-
-                var entity = entities[i];
-
-                // Find the property that ends with "ID" (case-insensitive)
-                var idProperty = entity.GetType()
-                    .GetProperties()
-                    .FirstOrDefault(prop => prop.Name.EndsWith("ID", StringComparison.OrdinalIgnoreCase));
-
-                if (idProperty != null)
+                var entity = context.Set<TEntity>().Find(id);
+                if (entity == null)
                 {
-                    // Get the value of the ID property
-                    var idValue = idProperty.GetValue(entity);
+                    Console.WriteLine("Nie znaleziono encji.");
+                    return;
+                }
 
-                    // Ensure the ID value is valid and call EditEntity
-                    if (idValue is int id)
+                if (typeof(TEntity) == typeof(Member))
+                {
+                    if (context.Sections.Where(s => s.LeadId == id).ToList().Count > 0)
                     {
-                        EditEntity<T>(id);
+                        _menu.ErrorMessage("Nie można usunąć członka, który prowadzi sekcje.");
+                        return;
                     }
-                    else
+                    else if(context.Courses.Where(c => c.LecturerId == id).ToList().Count > 0)
                     {
-                        Console.WriteLine($"Invalid ID value for entity: {idValue}");
+                        _menu.ErrorMessage("Nie można usunąć członka, który prowadzi kursy.");
+                        return;
+                    }
+                    else if (context.ProjectMembers.Where(p => p.MemberId == id).ToList().Count > 0)
+                    {
+                        _menu.ErrorMessage("Nie można usunąć członka, który jest przypisany do projektu.");
+                        return;
                     }
                 }
-                else
-                {
-                    Console.WriteLine("No ID property found on the entity.");
-                }
+
+                context.Set<TEntity>().Remove(entity);
+                context.SaveChanges();
+                _menu.ErrorMessage("Usunięto.");
             }
         }
 

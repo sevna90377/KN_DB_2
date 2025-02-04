@@ -195,6 +195,8 @@ namespace KN_DB.Main.View
             Console.SetCursorPosition(7, Console.CursorTop);    // powrót kursora na początek linii
             Console.WriteLine(v);
             Thread.Sleep(2000);
+            Console.SetCursorPosition(7, Console.CursorTop - 1);
+            Console.Write(new string(' ', 56));
         }
     }
 }

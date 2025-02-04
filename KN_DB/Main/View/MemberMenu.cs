@@ -35,6 +35,7 @@ namespace KN_DB.Main.View
                     sizeSwitch();
                     break;
                 case 3:
+                    Console.SetCursorPosition(7, Console.CursorTop - 2);
                     _presenter.Add<Member>();
                     break;
                 case 4:
@@ -50,12 +51,21 @@ namespace KN_DB.Main.View
             switch (bottom_choice)
             {
                 case 0:
-                    _presenter.Show(table => table.Members.OrderBy(m => m.MemberId), y-5);
+                    
                     bottom_choice = 0;
                     break;
-                case 1: //
+                case 1:
+                    var id = _presenter.IdfromIndex<Member>(table => table.Members.OrderBy(m => m.MemberId), y - 5);
+                    _presenter.Add<Member>(id);
+                    Console.Clear();
+                    _presenter.Show(table => table.Members.OrderBy(m => m.MemberId));
+                    bottom_choice = 0;
                     break;
                 case 2:
+                    id = _presenter.IdfromIndex<Member>(table => table.Members.OrderBy(m => m.MemberId), y - 5);
+                    _presenter.Delete<Member>(id);
+                    Console.Clear();
+                    _presenter.Show(table => table.Members.OrderBy(m => m.MemberId));
                     bottom_choice = 0;
                     break;
                 case 3:

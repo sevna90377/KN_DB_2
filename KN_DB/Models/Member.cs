@@ -16,7 +16,7 @@ public partial class Member
 
     public string? DiscordName { get; set; }
 
-    public DateOnly? JoinDate { get; set; }
+    public DateOnly JoinDate { get; set; }
 
     public bool IsCouncilMember { get; set; }
     [IgnoreOnCreation]
@@ -34,7 +34,7 @@ public partial class Member
     public override string ToString()
     {
         string line = "|".PadLeft(13);
-        line += Name.PadLeft(32) + "  |";
+        line += Name?.PadLeft(32) + "  |";
         if(DiscordName == null)
         {
             DiscordName = "N/A";
